@@ -1,11 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <title>Will You Be Mine ❤️</title>
-
 <style>
 body{
     margin:0;
@@ -15,32 +12,23 @@ body{
     align-items:center;
     height:100vh;
     overflow:hidden;
-    font-family:Segoe UI, sans-serif;
+    font-family:Segoe UI;
     position:relative;
 }
-
-/* Responsive canvas */
 canvas{
-    width:95vw;
-    height:50vh;
-    max-width:900px;
-    max-height:450px;
     background:linear-gradient(to top,#060010,#140022);
     box-shadow:0 0 40px #ff5fa2;
     border-radius:14px;
 }
-
-/* Buttons */
 #buttons{
     position:absolute;
-    bottom:20px;
+    bottom:40px;
     display:none;
-    gap:14px;
-    flex-wrap:wrap;
+    gap:20px;
 }
 button{
-    padding:10px 22px;
-    font-size:16px;
+    padding:12px 28px;
+    font-size:20px;
     border:none;
     border-radius:30px;
     cursor:pointer;
@@ -48,20 +36,18 @@ button{
 #yes{ background:#ff5fa2; color:white; }
 #no{ background:#333; color:white; }
 
-/* Videos */
 video{
     position:absolute;
     top:50%;
     left:50%;
     transform:translate(-50%,-50%);
-    width:95vw;
-    max-height:70vh;
+    width:80%;
+    max-height:80%;
     border-radius:14px;
     display:none;
     z-index:100;
 }
 
-/* Message box */
 #messageBox{
     position:absolute;
     top:50%;
@@ -69,11 +55,11 @@ video{
     transform:translate(-50%,-50%);
     background:#140022;
     color:#ffd6ef;
-    padding:24px;
-    border-radius:18px;
-    font-size:16px;
+    padding:30px;
+    border-radius:20px;
+    font-size:18px;
     line-height:1.5;
-    max-width:90vw;
+    max-width:600px;
     text-align:left;
     display:none;
     box-shadow:0 0 30px #ff5fa2;
@@ -83,7 +69,7 @@ video{
     display:block;
     margin:20px auto 0 auto;
     padding:10px 25px;
-    font-size:15px;
+    font-size:16px;
     border:none;
     border-radius:12px;
     background:#ff5fa2;
@@ -92,64 +78,63 @@ video{
 }
 </style>
 </head>
-
 <body>
 
-<canvas id="c"></canvas>
-
+<canvas id="c" width="900" height="450"></canvas>
 <div id="buttons">
     <button id="yes">YES ❤️</button>
     <button id="no">NO 💔</button>
 </div>
 
+<!-- Videos -->
 <video id="yesVideo" src="myYesVideo.mp4" controls></video>
 <video id="noVideo" src="myNoVideo.mp4" controls></video>
 
+<!-- Message box -->
 <div id="messageBox">
 I just want to say something that’s been in my heart.<br><br>
-This is not a proposal, and I’m not asking you to rush or commit right now.<br><br>
-I choose you. I like you, admire you, and care about you in a calm, real way.<br><br>
-I’m happy taking things slowly, at your pace. I just didn’t want to stay silent.<br><br>
+This is not a proposal, and I’m not asking you to commit or rush into a relationship right now. I respect that you need time, truly.<br><br>
+I just want you to know that I choose you. I like you, I admire you, and I care about you in a way that feels real and calm, not rushed or forced.<br><br>
+I’m happy taking things slowly, at your pace. Whether it takes time or space, I’m okay with that. I just didn’t want to stay silent about how special you are to me.<br><br>
 <button id="closeMessage">Close</button>
 </div>
 
+<!-- Background music -->
 <audio id="bgMusic" src="mySong.mp3" loop></audio>
 
 <script>
 const c = document.getElementById("c");
 const ctx = c.getContext("2d");
 const dpr = window.devicePixelRatio || 1;
+const rect = c.getBoundingClientRect();
+c.width = rect.width * dpr;
+c.height = rect.height * dpr;
+ctx.scale(dpr,dpr);
 
-/* Resize canvas for all screens */
-function resizeCanvas(){
-    const rect = c.getBoundingClientRect();
-    c.width = rect.width * dpr;
-    c.height = rect.height * dpr;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-/* Music autoplay fix */
+// Music autoplay fix
 const bgMusic = document.getElementById("bgMusic");
-document.addEventListener("click",()=>{
-    bgMusic.play().catch(()=>{});
-},{once:true});
+let musicStarted = false;
+document.addEventListener('click', () => {
+    if(!musicStarted){
+        bgMusic.play().catch(e => console.log("Audio play blocked", e));
+        musicStarted = true;
+    }
+}, { once: true });
 
-/* Animation vars */
-let manX = 80;
-let girlX = 520;
+// Animation variables
+let manX = 120;
+let girlX = 700;
 let walk = 0;
 let stage = "walk";
 let tears = [];
 
-const hearts = Array.from({length:30},()=>({
-    x:Math.random()*600,
-    y:600+Math.random()*300,
+const bgHearts = Array.from({length:40},()=>({
+    x:Math.random()*c.width/dpr,
+    y:c.height/dpr+Math.random()*300,
     s:Math.random()*1.2+.4
 }));
 
-function heart(h){
+function drawBGHeart(h){
     ctx.fillStyle="rgba(255,90,160,.6)";
     ctx.beginPath();
     ctx.moveTo(h.x,h.y);
@@ -160,94 +145,277 @@ function heart(h){
     if(h.y<-20) h.y=c.height/dpr+20;
 }
 
-function face(x,y,mode,color){
-    ctx.strokeStyle=color;
+function drawHeart(x, y, size){
+    ctx.fillStyle = "#ff1a4d";
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.bezierCurveTo(x - size/2, y - size/2, x - size, y + size/3, x, y + size);
+    ctx.bezierCurveTo(x + size, y + size/3, x + size/2, y - size/2, x, y);
+    ctx.fill();
+}
+
+function spawnTear(x,y){
+    tears.push({x:x+(Math.random()*4-2), y, v:1.5+Math.random(), life:60});
+}
+function drawTears(){
+    ctx.strokeStyle="#4fc3ff";
     ctx.lineWidth=2;
+    tears.forEach(t=>{
+        ctx.beginPath();
+        ctx.moveTo(t.x,t.y);
+        ctx.lineTo(t.x,t.y+8);
+        ctx.stroke();
+        t.y+=t.v;
+        t.life--;
+    });
+    tears = tears.filter(t=>t.life>0);
+}
+
+function drawFace(px,py,mode,type){
+    ctx.strokeStyle = type==="man"?"#fff":"#ff5fa2";
+    ctx.lineWidth = 2;
+    let eyeY = py-5;
+    let eyeOffsetX = 6;
+    let eyeRadius = 1.5;
+
+    ctx.beginPath();
     if(mode==="happy"){
-        ctx.beginPath();ctx.arc(x,y+4,4,0,Math.PI);ctx.stroke();
-    }else if(mode==="sad"){
-        ctx.beginPath();ctx.arc(x,y+6,4,Math.PI,0);ctx.stroke();
-    }else{
-        ctx.beginPath();ctx.moveTo(x-4,y+5);ctx.lineTo(x+4,y+5);ctx.stroke();
+        ctx.moveTo(px-eyeOffsetX-3,eyeY);
+        ctx.quadraticCurveTo(px-eyeOffsetX,eyeY+3,px-eyeOffsetX+3,eyeY);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(px+eyeOffsetX-3,eyeY);
+        ctx.quadraticCurveTo(px+eyeOffsetX,eyeY+3,px+eyeOffsetX+3,eyeY);
+        ctx.stroke();
+    } else if(mode==="sad"){
+        ctx.moveTo(px-eyeOffsetX-3,eyeY+2);
+        ctx.quadraticCurveTo(px-eyeOffsetX,eyeY-2,px-eyeOffsetX+3,eyeY+2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(px+eyeOffsetX-3,eyeY+2);
+        ctx.quadraticCurveTo(px+eyeOffsetX,eyeY-2,px+eyeOffsetX+3,eyeY+2);
+        ctx.stroke();
+    } else{
+        ctx.beginPath();
+        ctx.arc(px-eyeOffsetX,eyeY,eyeRadius,0,Math.PI*2);
+        ctx.fillStyle = ctx.strokeStyle;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(px+eyeOffsetX,eyeY,eyeRadius,0,Math.PI*2);
+        ctx.fill();
+    }
+
+    ctx.beginPath();
+    if(mode==="happy") ctx.arc(px,py+5,5,0,Math.PI);
+    else if(mode==="sad") ctx.arc(px,py+5,5,Math.PI,0,false);
+    else ctx.moveTo(px-4,py+5), ctx.lineTo(px+4,py+5);
+    ctx.stroke();
+}
+
+function drawMan(px,py,mode){
+    ctx.strokeStyle="#fff";
+    ctx.lineWidth=6;
+    ctx.lineCap="round";
+    ctx.shadowColor="#ff8acb";
+    ctx.shadowBlur=12;
+
+    let s=Math.sin(walk);
+    let legA = mode==="walk"?s*20:0;
+    let legB = mode==="walk"?-s*20:0;
+    let shake = mode==="cry"?Math.sin(Date.now()*0.01)*2:0;
+    let headDrop = mode==="cry"?10:0;
+
+    ctx.beginPath();
+    ctx.arc(px+shake,py-75+headDrop,18,0,Math.PI*2);
+    ctx.stroke();
+
+    if(stage==="walk"||stage==="ask") drawFace(px+shake,py-75+headDrop,"neutral","man");
+    else if(stage==="yes") drawFace(px+shake,py-75+headDrop,"happy","man");
+    else if(stage==="no") drawFace(px+shake,py-75+headDrop,"sad","man");
+
+    ctx.beginPath();
+    ctx.moveTo(px+shake,py-55);
+    ctx.lineTo(px+shake,py-5+(mode==="cry"?8:0));
+    ctx.stroke();
+
+    if(mode==="hug"){
+        ctx.beginPath();
+        ctx.moveTo(px,py-40);
+        ctx.lineTo(px+20,py-30);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(px,py-40);
+        ctx.lineTo(px-20,py-30);
+        ctx.stroke();
+    }
+    else if(mode==="cry"){
+        ctx.beginPath();
+        ctx.moveTo(px+shake,py-45);
+        ctx.lineTo(px-18+shake,py-10);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(px+shake,py-45);
+        ctx.lineTo(px+18+shake,py-10);
+        ctx.stroke();
+    }
+    else{
+        ctx.beginPath();
+        ctx.moveTo(px,py-45);
+        ctx.lineTo(px+30,py-25);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(px,py-45);
+        ctx.lineTo(px-25,py-25);
+        ctx.stroke();
+        drawHeart(px+40, py-30, 20);
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(px,py-5);
+    ctx.lineTo(px+legA,py+55);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(px,py-5);
+    ctx.lineTo(px+legB,py+55);
+    ctx.stroke();
+
+    if(mode==="cry"){
+        spawnTear(px-6+shake,py-65+headDrop);
+        spawnTear(px+6+shake,py-65+headDrop);
+        drawTears();
     }
 }
 
-function man(x,y,mode){
-    ctx.strokeStyle="#fff";ctx.lineWidth=5;
-    ctx.beginPath();ctx.arc(x,y-50,14,0,Math.PI*2);ctx.stroke();
-    face(x,y-50,stage==="no"?"sad":stage==="yes"?"happy":"neutral","#fff");
-    ctx.beginPath();ctx.moveTo(x,y-35);ctx.lineTo(x,y);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-10,y+40);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+10,y+40);ctx.stroke();
+function drawGirl(px,py,mode){
+    ctx.strokeStyle="#ff5fa2";
+    ctx.lineWidth=6;
+    ctx.shadowColor="#ff5fa2";
+    ctx.shadowBlur=12;
+
+    ctx.beginPath();
+    ctx.arc(px,py-75,18,0,Math.PI*2);
+    ctx.stroke();
+
+    if(stage==="yes") drawFace(px,py-75,"happy","girl");
+    else drawFace(px,py-75,"neutral","girl");
+
+    ctx.beginPath();
+    ctx.moveTo(px,py-55);
+    ctx.lineTo(px,py-10);
+    ctx.stroke();
+
+    if(mode==="hug"){
+        ctx.beginPath();
+        ctx.moveTo(px,py-40);
+        ctx.lineTo(px-20,py-30);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(px,py-40);
+        ctx.lineTo(px+20,py-30);
+        ctx.stroke();
+    }else{
+        ctx.beginPath();
+        ctx.moveTo(px,py-35);
+        ctx.lineTo(px-25,py-15);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(px,py-35);
+        ctx.lineTo(px+25,py-15);
+        ctx.stroke();
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(px,py-10);
+    ctx.lineTo(px-15,py+55);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(px,py-10);
+    ctx.lineTo(px+15,py+55);
+    ctx.stroke();
 }
 
-function girl(x,y){
-    ctx.strokeStyle="#ff5fa2";ctx.lineWidth=5;
-    ctx.beginPath();ctx.arc(x,y-50,14,0,Math.PI*2);ctx.stroke();
-    face(x,y-50,stage==="yes"?"happy":"neutral","#ff5fa2");
-    ctx.beginPath();ctx.moveTo(x,y-35);ctx.lineTo(x,y);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-10,y+40);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+10,y+40);ctx.stroke();
-}
-
-function text(msg){
+function drawText(msg){
+    ctx.save();
+    ctx.shadowBlur=0;
+    ctx.shadowColor="transparent";
     ctx.fillStyle="#ffd6ef";
+    ctx.font="600 32px Segoe UI";
     ctx.textAlign="center";
-    ctx.font = window.innerWidth<600?"18px Segoe UI":"26px Segoe UI";
-    ctx.fillText(msg,c.width/(2*dpr),30);
+    ctx.textBaseline="middle";
+    ctx.fillText(msg, c.width/(2*dpr), 60);
+    ctx.restore();
 }
 
 function animate(){
     ctx.clearRect(0,0,c.width/dpr,c.height/dpr);
-    hearts.forEach(heart);
+    bgHearts.forEach(drawBGHeart);
 
     if(stage==="walk"){
-        text("I have something for you ❤️");
-        manX+=1;
-        if(manX>260){
+        drawText("I have something for you ❤️");
+        drawMan(manX,330,"walk");
+        drawGirl(girlX,330,"stand");
+        manX+=1.4;
+        walk+=0.1;
+        if(manX>520){
             stage="ask";
             document.getElementById("buttons").style.display="flex";
         }
+    } else if(stage==="ask"){
+        drawText("Will you be mine forever?");
+        drawMan(manX,330,"stand");
+        drawGirl(girlX,330,"stand");
+    } else if(stage==="yes"){
+        drawText("She said YES 💖");
+        if(manX<610) manX+=1;
+        if(girlX>610) girlX-=1;
+        drawMan(manX,330,"hug");
+        drawGirl(girlX,330,"hug");
+    } else if(stage==="no"){
+        drawText("My heart is broken 💔");
+        drawMan(manX,330,"cry");
+        drawGirl(girlX,330,"stand");
     }
-    if(stage==="ask") text("Will you be mine forever?");
-    if(stage==="yes") text("She said YES 💖");
-    if(stage==="no") text("My heart is broken 💔");
-
-    man(manX,180);
-    girl(girlX,180);
 
     requestAnimationFrame(animate);
 }
 animate();
 
-/* Buttons */
-const yesVideo=document.getElementById("yesVideo");
-const noVideo=document.getElementById("noVideo");
-const box=document.getElementById("messageBox");
+// Button events
+const yesVideo = document.getElementById("yesVideo");
+const noVideo = document.getElementById("noVideo");
+const messageBox = document.getElementById("messageBox");
+const closeMessage = document.getElementById("closeMessage");
 
-document.getElementById("yes").onclick=()=>{
-    stage="yes";
-    document.getElementById("buttons").style.display="none";
-    setTimeout(()=>box.style.display="block",600);
+document.getElementById("yes").onclick = () => {
+    stage = "yes";
+    document.getElementById("buttons").style.display = "none";
+
+    const checkHug = setInterval(() => {
+        if (Math.abs(manX - 610) < 1 && Math.abs(girlX - 610) < 1) {
+            clearInterval(checkHug);
+            setTimeout(() => {
+                messageBox.style.display = "block";
+            }, 500);
+        }
+    }, 30);
 };
 
-document.getElementById("closeMessage").onclick=()=>{
-    box.style.display="none";
-    c.style.display="none";
-    yesVideo.style.display="block";
+closeMessage.onclick = () => {
+    messageBox.style.display = "none";
+    c.style.display = "none";
+    yesVideo.style.display = "block";
     yesVideo.play();
 };
 
-document.getElementById("no").onclick=()=>{
-    stage="no";
-    document.getElementById("buttons").style.display="none";
-    setTimeout(()=>{
-        c.style.display="none";
-        noVideo.style.display="block";
+document.getElementById("no").onclick = () => {
+    stage = "no";
+    document.getElementById("buttons").style.display = "none";
+    setTimeout(() => {
+        c.style.display = "none";
+        noVideo.style.display = "block";
         noVideo.play();
-    },2000);
+    }, 3000);
 };
 </script>
-
 </body>
 </html>
